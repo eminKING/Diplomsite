@@ -10,7 +10,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'ansible-playbook -i inventory -u ansible UpstreamServers.yml'
+                sh 'ansible-playbook-u ansible UpstreamServers.yml'
             }
         }
     }
