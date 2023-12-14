@@ -12,11 +12,6 @@
         name: epel-release
         state: present
 
-    - name: Установка firewalld, если он не установлен
-      yum:
-        name: firewalld
-        state: present
-
     - name: Установка необходимых пакетов
       yum:
         name:
