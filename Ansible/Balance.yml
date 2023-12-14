@@ -71,11 +71,6 @@
         replace: "root         /var/www/app;"
       notify: Перезагрузка Nginx
 
-    - name: Создать директорию conf.d, если её нет
-      file:
-        path: /etc/nginx/conf.d
-        state: directory
-
     - name: Создать файл nginx_upstream.conf
       file:
         path: /etc/nginx/conf.d/nginx_upstream.conf
