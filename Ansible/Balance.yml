@@ -1,0 +1,200 @@
+- name: Настройка серверов
+  hosts: balance_server
+  become: yes
+  tasks:
+    - name: Выполнить обновление
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Установка EPEL
+      yum:
+        name: epel-release
+        state: present
+
+    - name: Установка firewalld, если он не установлен
+      yum:
+        name: firewalld
+        state: present
+
+    - name: Установка необходимых пакетов
+      yum:
+        name:
+          - nano
+          - nginx
+          - php
+          - php-fpm
+          - git
+        state: present
+
+    - name: Включить службу Nginx
+      systemd:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Установка firewalld
+      yum:
+        name: firewalld
+        state: present
+
+    - name: Запуск firewalld
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Открыть порт 80 в firewall
+      shell: "firewall-cmd --add-port=80/tcp --permanent"
+
+    - name: Открыть порт 443 в firewall
+      shell: "firewall-cmd --add-port=443/tcp --permanent"
+
+    - name: Создать директорию
+      file:
+        path: /var/www/myapp
+        state: directory
+
+    - name: Изменение конфигурации Nginx
+      replace:
+        path: /etc/nginx/nginx.conf
+        regexp: "listen       80 default_server;"
+        replace: "listen 80;"
+      notify: Перезагрузка Nginx
+
+    - name: Замена server_name в конфигурации Nginx
+      replace:
+        path: /etc/nginx/nginx.conf
+        regexp: "server_name  _;"
+        replace: "server_name diplom.cloud;"
+      notify: Перезагрузка Nginx
+
+    - name: Замена root в конфигурации Nginx
+      replace:
+        path: /etc/nginx/nginx.conf
+        regexp: "root         /usr/share/nginx/html;"
+        replace: "root         /var/www/app;"
+      notify: Перезагрузка Nginx
+
+    - name: Создать директорию conf.d, если её нет
+      file:
+        path: /etc/nginx/conf.d
+        state: directory
+
+    - name: Создать файл nginx_upstream.conf
+      file:
+        path: /etc/nginx/conf.d/nginx_upstream.conf
+        state: touch
+
+    - name: Запись nginx_upstream.conf.j2
+      copy:
+        content: |
+          upstream myapp {
+              server 172.31.47.56;
+              server 172.31.39.254;
+          }
+        dest: /etc/nginx/conf.d/nginx_upstream.conf
+
+    - name: Создать файл server.conf
+      file:
+        path: /etc/nginx/conf.d/server.conf
+        state: touch
+
+    - name: Добавление конфигурации для PHP-FPM в server.conf
+      blockinfile:
+        path: /etc/nginx/conf.d/server.conf
+        block: |
+          server {
+              listen 80;
+              root /var/www/app;
+              index index.php index.html;
+
+              location ~ \.php$ {
+                  include fastcgi_params;
+                  fastcgi_pass unix:/run/php-fpm/www.sock;
+                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              }
+
+              location / {
+                  try_files $uri $uri/ /index.php?$args;
+              }
+           }
+        insertbefore: BOF
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        create: yes
+      notify: Перезагрузка Nginx
+
+    - name: Замена настроек PHP-FPM
+      replace:
+        path: /etc/php-fpm.d/www.conf
+        regexp: 'user = apache'
+        replace: 'user = nginx'
+
+    - name: Замена настроек PHP-FPM
+      replace:
+        path: /etc/php-fpm.d/www.conf
+        regexp: 'group = apache'
+        replace: 'group = nginx'
+
+    - name: Замена настроек PHP-FPM
+      replace:
+        path: /etc/php-fpm.d/www.conf
+        regexp: ';listen.owner = nobody'
+        replace: ';listen.owner = nginx'
+
+    - name: Замена настроек PHP-FPM
+      replace:
+        path: /etc/php-fpm.d/www.conf
+        regexp: ';listen.group = nobody'
+        replace: ';listen.group = nginx'
+
+    - name: Замена настроек PHP-FPM
+      replace:
+        path: /etc/php-fpm.d/www.conf
+        regexp: ';listen.mode\s*='
+        replace: 'listen.mode = 0660'
+
+    - name: Перезапуск службы PHP-FPM
+      systemd:
+        name: php-fpm
+        state: restarted
+
+    - name: Установка Certbot через EPEL-репозиторий
+      yum:
+        name: certbot
+        state: present
+        enablerepo: epel
+
+    - name: Установка плагина certbot
+      yum:
+        name:
+          - python3-certbot-nginx
+          - mod_ssl
+        state: present
+
+    - name: Создание конфигурационного файла Certbot
+      copy:
+        content: |
+          email = eminislamiv176@gmail.com
+          domains = diplom.cloud
+          agree-tos = true
+          noninteractive = true
+        dest: /etc/letsencrypt/config.ini
+
+    - name: Получение SSL-сертификата для Nginx с помощью Certbot
+      command: certbot --nginx --config /etc/letsencrypt/config.ini
+
+    - name: Планирование обновления SSL-сертификата с помощью Cron
+      cron:
+        name: "Обновление SSL-сертификата"
+        minute: "0"
+        hour: "3"
+        day: "1"
+        month: "*/2"
+        job: "certbot renew --noninteractive"
+
+  handlers:
+    - name: Перезагрузка Nginx
+      service:
+        name: nginx
+        state: restarted
