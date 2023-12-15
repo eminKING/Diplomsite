@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                sh "rm -rf /var/lib/jenkins/workspace/app/*"
                 git branch: 'main', url: 'https://github.com/your-repo.git'
             }
         }
