@@ -26,7 +26,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'vault-secret-text', variable: 'vault-password')]) {
                     sh '''
                         echo "Configuring servers..."
-                        sudo su - ansible -c "export ANSIBLE_VAULT_PASSWORD=$vault-password && ansible-playbook -i inventory Balance.yml && ansible-playbook -i inventory Upstream.yml"
+                        sudo su - ansible -c "export ANSIBLE_VAULT_PASSWORD=$vault-password && cd /var/lib/jenkins/workspace/app/Ansible && ansible-playbook -i inventory Balance.yml && ansible-playbook -i inventory Upstream.yml"
                     '''
                 }
             }
