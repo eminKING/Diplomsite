@@ -47,7 +47,7 @@
 
     - name: Создать директорию
       file:
-        path: /var/www/myapp
+        path: /var/www/app
         state: directory
 
     - name: Изменение конфигурации Nginx
