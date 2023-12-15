@@ -1,0 +1,144 @@
+---
+- hosts: localhost
+  become: true
+  vars_files:
+    - secrets
+  tasks:
+
+    - name: Выполнить обновление
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Установка fontconfig
+      yum:
+        name: fontconfig
+        state: present
+
+    - name: Установка Java 17
+      yum:
+        name: java-17-openjdk
+        state: present
+
+    - name: Загрузка файла репозитория Jenkins
+      get_url:
+        url: https://pkg.jenkins.io/redhat/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: Импорт GPG-ключа Jenkins
+      rpm_key:
+        key: https://pkg.jenkins.io/redhat/jenkins.io-2023.key
+        state: present
+
+    - name: Установка Jenkins
+      yum:
+        name: jenkins
+        state: present
+
+    - name: Запуск службы Jenkins
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Установка firewalld
+      yum:
+        name: firewalld
+        state: present
+
+    - name: Запуск firewalld
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Открыть порт 8080 в firewall
+      shell: "firewall-cmd --add-port=8080/tcp --permanent"
+
+    - name: Создание директории .ssh
+      become: yes
+      file:
+        path: /var/lib/jenkins/.ssh
+        state: directory
+
+    - name: Генерация пары SSH-ключей
+      community.crypto.openssh_keypair:
+        path: "/var/lib/jenkins/.ssh/id_rsa"
+        type: ed25519
+        size: 4096
+        owner: jenkins
+        group: jenkins
+        state: present
+
+    - name: Создайте файл known_hosts для Jenkins
+      ansible.builtin.file:
+        path: "/var/lib/jenkins/.ssh/known_hosts"
+        state: touch
+        owner: jenkins
+        group: jenkins
+        mode: "0600"
+      become: yes
+
+    - name: Получите ключи хоста GitHub
+      ansible.builtin.shell: "ssh-keyscan github.com"
+      register: github_host_key
+      become: yes
+      changed_when: false
+
+    - name: Добавление GitHub в known_hosts
+      ansible.builtin.shell: "ssh-keyscan github.com >> /var/lib/jenkins/.ssh/known_hosts"
+      become: yes
+      become_user: jenkins
+
+    - name: Добавление открытого ключа на GitHub
+      uri:
+        url: "https://api.github.com/user/keys"
+        method: POST
+        headers:
+          Authorization: "token {{ github_token }}"
+        body_format: json
+        body:
+          title: "Jenkins SSH Key"
+          key: "{{ lookup('file', '/var/lib/jenkins/.ssh/id_rsa.pub') }}"
+          read_only: true
+          username: "eminKING"
+      register: github_key_result
+      ignore_errors: yes
+
+    - name: Получение публичного IP
+      uri:
+        url: "https://api.ipify.org?format=json"
+        return_content: yes
+      register: ip_result
+
+    - name: Создание веб-хука GitHub
+      uri:
+        url: "https://api.github.com/repos/eminKING/Diplomsite/hooks"
+        method: POST
+        headers:
+          Authorization: "token {{ github_token }}"
+        body_format: json
+        body:
+          {
+            "name": "web",
+            "active": true,
+            "events": ["push", "pull_request"],
+            "config": {
+              "url": "http://{{ ip_result.json.ip }}:8080/github-webhook/",
+              "content_type": "json"
+            }
+          }
+        status_code: 201
+      register: webhook_result
+      ignore_errors: yes
+
+    - name: Перезапуск службы Jenkins
+      systemd:
+        name: jenkins
+        state: restarted
+
+    - debug:
+        var: github_key_result
+
+    - debug:
+        var: webhook_result
