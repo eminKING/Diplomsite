@@ -1,0 +1,26 @@
+sudo yum install epel-release -y
+sudo yum install ansible -y       либо     sudo python3 -m pip install ansible  (если не установлен pip: sudo yum install -y python3-pip) 
+sudo useradd -m -s /bin/bash ansible  
+sudo passwd ansible
+                  
+sudo usermod -aG wheel ansible    
+
+Пароль пользователя: ansible0765
+
+ansible-vault create secrets
+пароль: playbook0765
+
+github_token: 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
+
+ansible-playbook --ask-vault-pass jenkins.yml
+
+
+-------------------------------
+ansible-vault edit secrets.yml
+
+логин от Jenkins: admin
+пароль от Jenkins: admin0765
+
+
+
+
