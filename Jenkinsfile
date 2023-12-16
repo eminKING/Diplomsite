@@ -10,7 +10,7 @@ pipeline {
             steps {
                 script {
                     sh "rm -rf /var/lib/jenkins/workspace/app/*"
-                    git branch: 'main', url: 'https://github.com/your-repo.git'
+                    git branch: 'main', url: 'git@github.com:eminKING/Diplomsite.git'
                 }
             }
         }
