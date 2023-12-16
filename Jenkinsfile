@@ -40,7 +40,7 @@ pipeline {
                     input message: 'Do you want to proceed with configuring servers?', submitter: 'admin'
                     withCredentials([string(credentialsId: 'vault-secret-text', variable: 'vault-password')]) {
                         echo "Configuring servers..."
-                        sudo su - ansible -c "export ANSIBLE_VAULT_PASSWORD=$vault-password && cd /var/lib/jenkins/workspace/app/Ansible && ansible-playbook -i inventory Balance.yml && ansible-playbook -i inventory Upstream.yml"
+                        sudo su - ansible -c "export ANSIBLE_VAULT_PASSWORD=$vault-password && cd /var/lib/jenkins/workspace/app/Ansible && ansible-playbook -i inventory Balance.yml --user ec2-user && ansible-playbook -i inventory Upstream.yml --user ec2-user"
                     }
                 }
             }
