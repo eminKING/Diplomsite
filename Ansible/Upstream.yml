@@ -82,7 +82,7 @@
         block: |
           server {
               listen 80;
-              /var/www/app;
+              root /var/www/app;
               index index.php index.html;
 
               location ~ \.php$ {
