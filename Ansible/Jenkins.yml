@@ -10,6 +10,11 @@
         name: '*'
         state: latest
 
+    - name: Установить Git
+      package:
+        name: git
+        state: present
+
     - name: Установка fontconfig
       yum:
         name: fontconfig
