@@ -10,7 +10,7 @@ pipeline {
             steps {
                 script {
                     sh "rm -rf /var/lib/jenkins/workspace/app/*"
-                    git 'git@github.com:eminKING/Diplomsite.git'
+                    sh "git clone git@github.com:eminKING/Diplomsite.git /var/lib/jenkins/workspace/app/"
                 }
             }
         }
