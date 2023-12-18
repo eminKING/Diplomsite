@@ -9,8 +9,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    sh "sudo su - ansible -c rm -rf /var/lib/jenkins/workspace/app/*"
-                    sh "sudo su - ansible -c git clone git@github.com:eminKING/Diplomsite.git /var/lib/jenkins/workspace/app/"
+                    sh "rm -rf /var/lib/jenkins/workspace/app/*"
+                    sh "git clone git@github.com:eminKING/Diplomsite.git /var/lib/jenkins/workspace/app/"
                 }
             }
         }
@@ -19,10 +19,10 @@ pipeline {
             steps {
                 script {
                     echo "Deploying..."
-                    sudo su - ansible -c scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.44.15:/home/ec2-user/var/www/app
-                    sudo su - ansible -c  scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.35.168:/home/ec2-user/var/www/app
-                    sudo su - ansible -c ssh ec2-user@172.31.44.15 "rm -rf /var/www/app/ansible && rm /var/www/app/Jenkinsfile"
-                    sudo su - ansible -c ssh ec2-user@172.31.35.168 "rm -rf /var/www/app/ansible && rm /var/www/app/Jenkinsfile"
+                     scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.44.15:/home/ec2-user/var/www/app
+                     scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.35.168:/home/ec2-user/var/www/app
+                     ssh ec2-user@172.31.44.15 "rm -rf /var/www/app/ansible && rm /var/www/app/Jenkinsfile"
+                     ssh ec2-user@172.31.35.168 "rm -rf /var/www/app/ansible && rm /var/www/app/Jenkinsfile"
                 }
             }
         }
