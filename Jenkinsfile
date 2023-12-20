@@ -19,10 +19,12 @@ pipeline {
             steps {
                 script {
                     echo "Deploying..."
-                     scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.44.15:/var/www/app
-                     scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.35.168:/var/www/app
-                     ssh ec2-user@172.31.44.15 "rm -rf /var/www/app/ansible && rm /var/www/app/Jenkinsfile"
-                     ssh ec2-user@172.31.35.168 "rm -rf /var/www/app/ansible && rm /var/www/app/Jenkinsfile"
+                     ssh ec2-user@172.31.44.15 "rm -rf app/"
+                     ssh ec2-user@172.31.35.168 "rm -rf app/"
+                     scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.44.15:/home/ec2-user/
+                     scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.35.168:/home/ec2-user/
+                     ssh ec2-user@172.31.44.15 "rm -rf app/Ansible && rm app/Jenkinsfile"
+                     ssh ec2-user@172.31.35.168 "rm -rf app/Ansible && rm app/Jenkinsfile"
                 }
             }
         }
