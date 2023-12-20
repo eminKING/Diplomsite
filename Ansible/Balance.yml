@@ -47,7 +47,7 @@
 
     - name: Создать директорию
       file:
-        path: /app
+        path: /home/ec2-user/app
         state: directory
 
     - name: Изменение конфигурации Nginx
@@ -68,7 +68,7 @@
       replace:
         path: /etc/nginx/nginx.conf
         regexp: "root         /usr/share/nginx/html;"
-        replace: "root         /app;"
+        replace: "root         /home/ec2-user/app;"
       notify: Перезагрузка Nginx
 
     - name: Создать файл nginx_upstream.conf
@@ -96,7 +96,7 @@
         block: |
           server {
               listen 80;
-              root /app;
+              root /home/ec2-user/app;
               index index.php index.html;
 
               location ~ \.php$ {
