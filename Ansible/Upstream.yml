@@ -47,7 +47,7 @@
 
     - name: Создать директорию
       file:
-        path: /var/www/app
+        path: /app
         state: directory
 
     - name: Изменение конфигурации Nginx
@@ -68,7 +68,7 @@
       replace:
         path: /etc/nginx/nginx.conf
         regexp: "root         /usr/share/nginx/html;"
-        replace: "root         /var/www/app;"
+        replace: "root         /app;"
       notify: Перезагрузка Nginx
 
     - name: Создать файл server.conf
@@ -82,7 +82,7 @@
         block: |
           server {
               listen 80;
-              root /var/www/app;
+              root /app;
               index index.php index.html;
 
               location ~ \.php$ {
