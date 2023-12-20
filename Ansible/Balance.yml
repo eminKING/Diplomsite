@@ -95,7 +95,7 @@
         path: /etc/nginx/conf.d/server.conf
         block: |
           server {
-              listen 443;
+              listen 80;
               root /home/ec2-user/app;
               index index.php index.html;
 
