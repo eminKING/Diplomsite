@@ -9,8 +9,10 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    sh "rm -rf /var/lib/jenkins/workspace/app/*"
-                    sh "git clone git@github.com:eminKING/Diplomsite.git /var/lib/jenkins/workspace/app/"
+                    // Удаляем текущую рабочую директорию
+                    deleteDir()
+                    // Клонируем новый репозиторий
+                    checkout scm
                 }
             }
         }
