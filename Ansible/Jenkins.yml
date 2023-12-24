@@ -79,6 +79,8 @@
       ansible.builtin.file:
         path: "/var/lib/jenkins/.ssh/known_hosts"
         state: touch
+        owner: jenkins
+        group: jenkins
         mode: "0664"
       become: yes
 
