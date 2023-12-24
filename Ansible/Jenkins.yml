@@ -79,9 +79,6 @@
       ansible.builtin.file:
         path: "/var/lib/jenkins/.ssh/known_hosts"
         state: touch
-        owner: ''
-        group: jenkins
-        mode: "0600"
       become: yes
 
     - name: Получите ключи хоста GitHub
