@@ -45,11 +45,6 @@
     - name: Открыть порт 443 в firewall
       shell: "firewall-cmd --add-port=443/tcp --permanent"
 
-    - name: Создать директорию
-      file:
-        path: /home/ec2-user/app
-        state: directory
-
     - name: Изменение конфигурации Nginx
       replace:
         path: /etc/nginx/nginx.conf
