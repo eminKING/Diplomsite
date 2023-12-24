@@ -81,7 +81,7 @@
         state: touch
         owner: jenkins
         group: jenkins
-        mode: "0664"
+        mode: "0777"
       become: yes
 
     - name: Получите ключи хоста GitHub
