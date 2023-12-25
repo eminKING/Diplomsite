@@ -20,6 +20,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-user-ssh', keyFileVariable: 'KEYFILE')]) {
                     echo "Deploying..."
                         sh '''
                             ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/"
@@ -32,7 +33,7 @@ pipeline {
                 }
             }
         }
-
+    }
         stage('Configure Servers') {
             when {
                 expression {
