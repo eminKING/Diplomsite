@@ -79,7 +79,7 @@
               include /etc/nginx/conf.d/nginx_upstream.conf;
               proxy_pass http://myapp;
           }
-      notify: Перезагрука Nginx
+      notify: Перезагрузка Nginx
 
     - name: Создать файл nginx_upstream.conf
       file:
