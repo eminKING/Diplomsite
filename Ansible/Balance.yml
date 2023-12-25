@@ -77,6 +77,7 @@
         insertafter: '#For proxy'
         line: |
           location / {
+              include /etc/nginx/conf.d/nginx_upstream.conf;
               proxy_pass http://myapp;
           }
 
