@@ -77,7 +77,7 @@
         insertafter: '#For proxy'
         line: |
               location / {
-               proxy_pass http://myapp;
+               proxy_pass https://myapp;
               }
 
     - name: Создать файл nginx_upstream.conf
