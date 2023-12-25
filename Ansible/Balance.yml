@@ -74,7 +74,7 @@
     - name: Добавить proxy_pass в nginx.conf
       ansible.builtin.lineinfile:
         path: /etc/nginx/nginx.conf
-        insertafter: '# Load configuration files for the default server block.'
+        insertafter: '#For proxy'
         line: |
           location / {
               proxy_pass https://myapp;
