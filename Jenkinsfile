@@ -6,6 +6,16 @@ pipeline {
     }
 
     stages {
+        stage('Abort Previous Builds') {
+            steps {
+                script {
+                    def hi = Jenkins.instance.getItemByFullName(env.JOB_NAME)
+                    hi.builds.findAll { it.isBuilding() && it != currentBuild }.each {
+                        it.doStop()
+                    }
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 script {
@@ -33,7 +43,6 @@ pipeline {
                 }
             }
         }
-    }
         stage('Configure Servers') {
             when {
                 expression {
