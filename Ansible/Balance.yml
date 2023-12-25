@@ -72,13 +72,10 @@
       notify: Перезагрузка Nginx
 
     - name: Добавить proxy_pass в конфигурацию Nginx
-      blockinfile:
+      lineinfile:
         path: /etc/nginx/nginx.conf
-        block: |
-          location / {
-              include /etc/nginx/conf.d/nginx_upstream.conf;
-              proxy_pass http://myapp;
-          }
+        insertafter: '^include /etc/nginx/default\.d/\*\.conf;'
+        line: '    proxy_pass http://myapp;'
       notify: Перезагрузка Nginx
 
     - name: Создать файл nginx_upstream.conf
