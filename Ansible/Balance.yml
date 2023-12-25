@@ -76,10 +76,7 @@
         path: /etc/nginx/nginx.conf
         insertafter: '#For proxy'
         line: |
-          location / {
-              include /etc/nginx/conf.d/nginx_upstream.conf;
               proxy_pass https://myapp;
-          }
 
     - name: Создать файл nginx_upstream.conf
       file:
