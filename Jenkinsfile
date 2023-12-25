@@ -53,6 +53,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'vault-secret-text', variable: 'vault-password')]) {
                         sh '''
                             echo "Configuring servers..."
+                            scp -r /var/lib/jenkins/workspace/app/nginx.conf ec2-user@172.31.40.24:/home/ec2-user/etc/nginx/
                             sudo su - ansible -c "export ANSIBLE_VAULT_PASSWORD=$vault-password && cd /var/lib/jenkins/workspace/app/Ansible && ansible-playbook -i inventory.ini Balance.yml --user ec2-user && ansible-playbook -i inventory.ini Upstream.yml --user ec2-user"
                         '''
                     }
