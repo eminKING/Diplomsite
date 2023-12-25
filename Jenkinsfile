@@ -30,10 +30,10 @@ pipeline {
                             ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                             ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                         '''
+                    }
                 }
             }
         }
-    }
         stage('Configure Servers') {
             when {
                 expression {
@@ -44,7 +44,9 @@ pipeline {
             steps {
                 script {
                     echo "Waiting for approval to configure servers..."
-                    input message: 'Do you want to proceed with configuring servers?', submitter: 'admin'
+                    timeout(time: 15, unit: 'SECONDS') {
+                        input message: 'Do you want to proceed with configuring servers?', submitter: 'admin'
+                    }
                 }
 
                 script {
