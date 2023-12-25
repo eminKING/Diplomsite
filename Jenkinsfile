@@ -54,8 +54,11 @@ pipeline {
                         sh '''
                             echo "Configuring servers..."
                             ssh ec2-user@172.31.40.24 "rm -rf /home/ec2-user/nginx.conf"
+                            ssh ec2-user@172.31.40.24 "rm -rf /home/ec2-user/server.conf"
                             scp -r /var/lib/jenkins/workspace/app/Ansible/nginx.conf ec2-user@172.31.40.24:/home/ec2-user/
+                            scp -r /var/lib/jenkins/workspace/app/Ansible/server.conf ec2-user@172.31.40.24:/home/ec2-user/
                             ssh ec2-user@172.31.40.24 "cp /home/ec2-user/nginx.conf /etc/nginx/nginx.conf"
+                            ssh ec2-user@172.31.40.24 "cp /home/ec2-user/server.conf /etc/nginx/conf.d/server.conf"
                             sudo su - ansible -c "export ANSIBLE_VAULT_PASSWORD=$vault-password && cd /var/lib/jenkins/workspace/app/Ansible && ansible-playbook -i inventory.ini Balance.yml --user ec2-user && ansible-playbook -i inventory.ini Upstream.yml --user ec2-user"
                         '''
                     }
