@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    //Проверка отмены предыдущей сборки
+    
     environment {
         IS_WEBHOOK = "${env.JENKINS_TRIGGERED_BY_WEBHOOK ?: 'false'}"
     }
@@ -36,27 +36,23 @@ pipeline {
         }
 
         stage('Configure Servers') {
-            when {
-                expression {
-                    // Пропускаем стадию, если это вебхук
-                    return IS_WEBHOOK != 'true'
-                }
-            }
             steps {
                 script {
+                    echo "Checking if previous build was triggered by webhook..."
+                    
+                    def previousBuild = currentBuild.rawBuild.getPreviousBuild()
+                    
+                    if (previousBuild && previousBuild.resultIsBetterOrEqualTo(hudson.model.Result.SUCCESS) && IS_WEBHOOK == 'true') {
+                        echo "Previous build was triggered by webhook. Aborting the previous build."
+                        previousBuild.result = 'ABORTED'
+                        return
+                    }
+
                     echo "Waiting for approval to configure servers..."
                     input message: 'Do you want to proceed with configuring servers?', submitter: 'admin'
                 }
 
                 script {
-                    // Если это вебхук, автоматически отклоняем предыдущий запуск
-                    if (IS_WEBHOOK == 'true') {
-                        currentBuild.result = 'ABORTED'
-                        echo "Обнаружен вебхук. Прерывание предыдущей сборки."
-                        return
-                    }
-
-                    // В противном случае выполняем стандартные действия
                     withCredentials([string(credentialsId: 'vault-secret-text', variable: 'vault-password')]) {
                         sh '''
                             echo "Configuring servers..."
