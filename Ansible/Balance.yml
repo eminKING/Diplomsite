@@ -71,17 +71,6 @@
         replace: "root         /home/ec2-user/app;"
       notify: Перезагрузка Nginx
 
-    - name: Добавить proxy_pass в конфигурацию Nginx
-      replace:
-        path: /etc/nginx/nginx.conf
-        regexp: "include /etc/nginx/conf.d/*.conf;"
-        replace: |         
-          "location / {
-              include /etc/nginx/conf.d/*.conf;
-              proxy_pass http://myapp;
-          }"
-      notify: Перезагрузка Nginx
-
     - name: Создать файл nginx_upstream.conf
       file:
         path: /etc/nginx/conf.d/nginx_upstream.conf
@@ -93,6 +82,10 @@
           upstream myapp {
               server 172.31.44.15;
               server 172.31.35.168;
+          }
+
+          location / {
+          proxy_pass http://myapp;
           }
         dest: /etc/nginx/conf.d/nginx_upstream.conf
 
