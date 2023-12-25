@@ -1,7 +1,6 @@
 pipeline {
     agent any
-//проверка на вебхук
-    //проверка на триггер
+    
     environment {
         IS_WEBHOOK = "${env.JENKINS_TRIGGERED_BY_WEBHOOK ?: 'false'}"
     }
