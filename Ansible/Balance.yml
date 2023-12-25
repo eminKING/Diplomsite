@@ -74,13 +74,12 @@
     - name: Добавить proxy_pass в конфигурацию Nginx
       replace:
         path: /etc/nginx/nginx.conf
-        regexp: '(^include /etc/nginx/conf\.d/\*\.conf;)'
-        replace: |
-          $1
-          location / {
+        regexp: "include /etc/nginx/conf.d/*.conf;"
+        replace: |         
+          "location / {
               include /etc/nginx/conf.d/*.conf;
               proxy_pass http://myapp;
-          }
+          }"
       notify: Перезагрузка Nginx
 
     - name: Создать файл nginx_upstream.conf
