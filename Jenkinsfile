@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: 'ec2-user-ssh', keyFileVariable: 'KEYFILE')]) {
-                    echo "Deploying..."
+                        echo "Deploying..."
                         sh '''
                             ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/"
                             ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/"
@@ -30,14 +30,15 @@ pipeline {
                             ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                             ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                         '''
+                    }
                 }
             }
         }
-    }
+
         stage('Configure Servers') {
             when {
                 expression {
-                    // Выполняем стадию только если это не webhook
+                    // Пропускаем стадию, если это вебхук
                     return IS_WEBHOOK != 'true'
                 }
             }
@@ -48,6 +49,14 @@ pipeline {
                 }
 
                 script {
+                    // Если это вебхук, автоматически отклоняем предыдущий запуск
+                    if (IS_WEBHOOK == 'true') {
+                        currentBuild.result = 'ABORTED'
+                        echo "Обнаружен вебхук. Прерывание предыдущей сборки."
+                        return
+                    }
+
+                    // В противном случае выполняем стандартные действия
                     withCredentials([string(credentialsId: 'vault-secret-text', variable: 'vault-password')]) {
                         sh '''
                             echo "Configuring servers..."
