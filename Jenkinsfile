@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+    //Проверка отмены предыдущей сборки
     environment {
         IS_WEBHOOK = "${env.JENKINS_TRIGGERED_BY_WEBHOOK ?: 'false'}"
     }
