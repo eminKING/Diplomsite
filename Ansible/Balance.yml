@@ -86,7 +86,7 @@
 
           server {
             location / {
-              proxy_pass http://myapp;
+              proxy_pass https://myapp;
             }
           }
         dest: /etc/nginx/conf.d/nginx_upstream.conf
