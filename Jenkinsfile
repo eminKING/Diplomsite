@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     echo "Waiting for approval to configure servers..."
-                    timeout(time: 15, unit: 'SECONDS') {
+                    timeout(time: 30, unit: 'SECONDS') {
                         input message: 'Do you want to proceed with configuring servers?', submitter: 'admin'
                     }
                 }
