@@ -84,8 +84,10 @@
               server 172.31.35.168;
           }
 
-          location / {
-          proxy_pass http://myapp;
+          server {
+            location / {
+              proxy_pass http://myapp;
+            }
           }
         dest: /etc/nginx/conf.d/nginx_upstream.conf
 
