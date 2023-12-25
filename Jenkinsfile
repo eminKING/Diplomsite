@@ -6,16 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Abort Previous Builds') {
-            steps {
-                script {
-                    def hi = Jenkins.instance.getItemByFullName(env.JOB_NAME)
-                    hi.builds.findAll { it.isBuilding() && it != currentBuild }.each {
-                        it.doStop()
-                    }
-                }
-            }
-        }
         stage('Checkout') {
             steps {
                 script {
@@ -40,10 +30,10 @@ pipeline {
                             ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                             ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                         '''
-                    }
                 }
             }
         }
+    }
         stage('Configure Servers') {
             when {
                 expression {
