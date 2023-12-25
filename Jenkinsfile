@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: 'ec2-user-ssh', keyFileVariable: 'KEYFILE')]) {
-                        echo "Deploying..."
+                    echo "Deploying..."
                         sh '''
                             ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/"
                             ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/"
@@ -30,24 +30,19 @@ pipeline {
                             ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                             ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                         '''
-                    }
                 }
             }
         }
-
+    }
         stage('Configure Servers') {
+            when {
+                expression {
+                    // Выполняем стадию только если это не webhook
+                    return IS_WEBHOOK != 'true'
+                }
+            }
             steps {
                 script {
-                    echo "Checking if previous build was triggered by webhook..."
-                    
-                    def previousBuild = currentBuild.rawBuild.getPreviousBuild()
-                    
-                    if (previousBuild && previousBuild.resultIsBetterOrEqualTo(hudson.model.Result.SUCCESS) && IS_WEBHOOK == 'true') {
-                        echo "Previous build was triggered by webhook. Aborting the previous build."
-                        previousBuild.result = 'ABORTED'
-                        return
-                    }
-
                     echo "Waiting for approval to configure servers..."
                     input message: 'Do you want to proceed with configuring servers?', submitter: 'admin'
                 }
