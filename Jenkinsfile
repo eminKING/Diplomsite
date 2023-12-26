@@ -27,8 +27,8 @@ pipeline {
                             ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/"
                             scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.44.15:/home/ec2-user/
                             scp -r /var/lib/jenkins/workspace/app/ ec2-user@172.31.35.168:/home/ec2-user/
-                            ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile && rm /home/ec2-user/app/index.php"
-                            ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile && rm -rf /home/ec2-user/app/css/ && rm -rf /home/ec2-user/app/images/ && rm -rf /home/ec2-user/app/index.html && rm -rf /home/ec2-user/app/js/"
+                            ssh ec2-user@172.31.44.15 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
+                            ssh ec2-user@172.31.35.168 "rm -rf /home/ec2-user/app/Ansible && rm /home/ec2-user/app/Jenkinsfile"
                         '''
                     }
                 }
