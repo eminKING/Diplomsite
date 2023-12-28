@@ -8,3 +8,5 @@ print 'Server IP Address: ' . $ipAddress;
 
 // Выводим информацию о PHP
 phpinfo();
+
+//AUTOOOO
